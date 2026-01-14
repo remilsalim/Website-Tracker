@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Tracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Time <span>Tracker</span></h1>
+      <p id="current-date"></p>
+    </header>
+
+    <main>
+      <div id="stats-container">
+        <!-- Stats will be injected here -->
+        <div class="loader">Loading stats...</div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Tracking active browsing time</p>
+    </footer>
+  </div>
+  <script src="mock-storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>
