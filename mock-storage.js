@@ -1,18 +1,24 @@
-// Comprehensive Mocking for Local Development
+/**
+ * Website Time Tracker - Mock Storage v2
+ */
 (function () {
-    // In a real extension, chrome.storage is defined. In a normal tab, it is not.
-    const isExtension = typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local;
+    const isExtension = !!(window.chrome && chrome.runtime && chrome.runtime.id);
 
     if (!isExtension) {
-        console.log('%c[Website Tracker] Running in Mock Mode', 'background: #0f172a; color: #38bdf8; padding: 4px; border-radius: 4px;');
+        console.log('%c[Website Tracker] UI Preview Mode Active', 'background: #0ea5e9; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold;');
+
+        // Generate Mock Data for Today
+        const today = new Date().toISOString().split('T')[0];
+        const baseTime = Date.now();
 
         const mockData = {
-            [new Date().toISOString().split('T')[0]]: {
-                'google.com': { totalTime: 5420, firstVisit: Date.now() - 36000000 },
-                'youtube.com': { totalTime: 2100, firstVisit: Date.now() - 25000000 },
-                'github.com': { totalTime: 1850, firstVisit: Date.now() - 15000000 },
-                'chatgpt.com': { totalTime: 900, firstVisit: Date.now() - 5000000 },
-                'stackoverflow.com': { totalTime: 450, firstVisit: Date.now() - 1000000 }
+            [today]: {
+                'google.com': { totalTime: 5420, firstVisit: baseTime - 36000000 },
+                'youtube.com': { totalTime: 2100, firstVisit: baseTime - 25000000 },
+                'github.com': { totalTime: 1850, firstVisit: baseTime - 15000000 },
+                'chatgpt.com': { totalTime: 1200, firstVisit: baseTime - 8000000 },
+                'twitter.com': { totalTime: 900, firstVisit: baseTime - 4000000 },
+                'stackoverflow.com': { totalTime: 450, firstVisit: baseTime - 1000000 }
             }
         };
 
@@ -21,27 +27,22 @@
         chrome.storage = chrome.storage || {
             local: {
                 get: async (keys) => {
-                    const dateKey = new Date().toISOString().split('T')[0];
                     if (typeof keys === 'string') return { [keys]: mockData[keys] };
-                    if (Array.isArray(keys)) {
-                        const result = {};
-                        keys.forEach(k => result[k] = mockData[k]);
-                        return result;
-                    }
                     return mockData;
                 },
-                set: async (data) => console.log('[Mock Storage] Set:', data)
+                set: async (data) => console.log('[Mock Storage] Set:', data),
+                remove: async (keys) => console.log('[Mock Storage] Removed:', keys)
             }
         };
 
         chrome.runtime = chrome.runtime || {
-            id: 'mock-id',
-            getURL: (path) => path
+            id: 'mock-extension-id',
+            getURL: (p) => p
         };
 
-        // Silence other APIs
-        chrome.tabs = chrome.tabs || { onActivated: { addListener: () => { } }, onUpdated: { addListener: () => { } } };
-    } else {
-        console.log('[Website Tracker] Running in Extension Mode');
+        // Stub other extension APIs
+        chrome.tabs = chrome.tabs || { onActivated: { addListener: () => { } }, onUpdated: { addListener: () => { } }, query: async () => [] };
+        chrome.windows = chrome.windows || { onFocusChanged: { addListener: () => { } } };
+
     }
 })();
